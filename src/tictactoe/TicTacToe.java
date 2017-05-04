@@ -8,9 +8,7 @@ import java.util.Scanner;
 public class TicTacToe {
     // Ai: "X", Player: "O"
     public static void main(String[] args) {
-        boolean someoneWin = false;
         char curtPlayer;
-        char winner;
         GameBoard gb = new GameBoard();
         gb.displayBoard();
 
@@ -40,8 +38,9 @@ public class TicTacToe {
                 gb.displayBoard();
                 System.out.println();
             } else { // AI's turn
-                int[] res = gb.ABSearch(gb.board);
-                gb.board[res[0]][res[1]] = 'X';
+                int[] res = gb.ABSearch();
+                gb.makeMove('X', res[0], res[1]);
+                System.out.println("AI made move on " + res[0] + " " + res[1]);
                 if (gb.checkWin(curtPlayer)) break;
                 curtPlayer = 'O';
                 gb.displayBoard();
@@ -49,10 +48,10 @@ public class TicTacToe {
 
         }
         if (gb.cellLeft == 0) {
-            if (gb.checkWin('X')) {
-                System.out.println("Player X has won!");
-            } else if (gb.checkWin('O')) {
-                System.out.println("Player O has won!");
+            if (gb.checkWin(gb.AI_MARK)) {
+                System.out.println("X has won!");
+            } else if (gb.checkWin(gb.PLAYER_MARK)) {
+                System.out.println("O has won!");
             } else {
                 System.out.println("Draw!");
             }
