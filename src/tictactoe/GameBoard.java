@@ -20,7 +20,7 @@ public class GameBoard {
     private boolean cutoff;
     private int maxDepth, totalNodes, maxCount , minCount;
     private long startTime;
-    private static long TIME_INTERVAL = 10000000000l;
+    private static long TIME_INTERVAL = 10000l;
 
     public GameBoard() {
         board = new char[SIZE][SIZE];
@@ -35,6 +35,10 @@ public class GameBoard {
         for (int row = 0; row < SIZE; row++) {
             System.out.println(Arrays.toString(board[row]));
         }
+    }
+
+    public int getSize() {
+        return SIZE;
     }
 
     public boolean makeMove(char player, int row, int col) {
@@ -103,13 +107,13 @@ public class GameBoard {
         return result;
     }
 
-    public int[] ABSearch() {
+    public int[] ABSearch(int difficulty) {
         cutoff = false;
         totalNodes = 1;
         maxCount = 0;
         minCount = 0;
         maxDepth = 0;
-        startTime = System.nanoTime();
+        startTime = System.currentTimeMillis();
         int value = Integer.MIN_VALUE;
         int[] move = new int[2];
         List<int[]> availableCell = getAvailableCell();
@@ -117,7 +121,7 @@ public class GameBoard {
         for (int[] point : availableCell) {
             if (board[point[0]][point[1]] == '~') {
                 board[point[0]][point[1]] = 'X';
-                int result = Min_Value(-1000, 1000, 1);
+                int result = Min_Value(-1000, 1000, 1, difficulty);
                 board[point[0]][point[1]] = '~';
                 if (result > value) {
                     value = result;
@@ -135,14 +139,18 @@ public class GameBoard {
         return move;
     }
 
-    public int Max_Value(int a, int b, int depth) {
+    public int Max_Value(int a, int b, int depth, int difficulty) {
         if (cutoff) {
             return eval();
         }
+        if (depth >= difficulty) {
+            return 0;
+        }
+
         totalNodes++;
         maxCount++;
         maxDepth = Math.max(depth, maxDepth);
-        if (!cutoff && (System.nanoTime() - startTime >= TIME_INTERVAL)) { // cutoff
+        if (!cutoff && (System.currentTimeMillis() - startTime >= TIME_INTERVAL)) { // cutoff
             cutoff = true;
         }
         if (checkWin(PLAYER_MARK)) { // terminal state: Player won!
@@ -157,7 +165,7 @@ public class GameBoard {
         for (int[] point : availableCell) {
             if (board[point[0]][point[1]] == '~') {
                 board[point[0]][point[1]] = AI_MARK;
-                value = Math.max(value, Min_Value(a, b, depth + 1));
+                value = Math.max(value, Min_Value(a, b, depth + 1, difficulty));
                 board[point[0]][point[1]] = '~';
 
                 if (value >= b) {
@@ -169,16 +177,18 @@ public class GameBoard {
         return value;
     }
 
-    public int Min_Value(int a, int b, int depth) {
+    public int Min_Value(int a, int b, int depth, int difficulty) {
         if (cutoff) {
-            int res = eval();
-            return res;
+            return eval();
+        }
+        if (depth >= difficulty) {
+            return 0;
         }
         totalNodes++;
         minCount++;
         maxDepth = Math.max(depth, maxDepth);
 
-        if (!cutoff && System.nanoTime() - startTime >= TIME_INTERVAL) { // cutoff
+        if (!cutoff && System.currentTimeMillis() - startTime >= TIME_INTERVAL) { // cutoff
             cutoff = true;
         }
         if (checkWin(AI_MARK)) { // terminal state: AI won!
@@ -193,7 +203,7 @@ public class GameBoard {
         for (int[] point : availableCell) {
             if (board[point[0]][point[1]] == '~') {
                 board[point[0]][point[1]] = PLAYER_MARK;
-                value = Math.min(value, Max_Value(a, b, depth + 1));
+                value = Math.min(value, Max_Value(a, b, depth + 1, difficulty));
                 board[point[0]][point[1]] = '~';
 
                 if (value <= a) {
