@@ -8,10 +8,12 @@ import java.util.Scanner;
 public class TicTacToe {
     // Ai: "X", Player: "O"
     public static void main(String[] args) {
-        char curtPlayer;
+        char curtPlayer; // this is the flag indicates which one's turn
+
         GameBoard gb = new GameBoard();
         gb.displayBoard();
         int difficulty = 1;
+        // adjust difficulty by changing max searching depth
         String[] mode = new String[]{"Easy", "Medium", "Hard"};
         Scanner sc = new Scanner(System.in);
         System.out.println("Please select difficulty: 1: Easy, 2: Medium, 3: Hard");
@@ -20,6 +22,7 @@ public class TicTacToe {
             throw new IllegalArgumentException("Difficulty is between 1 - 3");
         }
         System.out.println("You selected " + mode[difficulty - 1] + " mode.\n");
+        // let player choose whether go first or second
         System.out.println("Do you want to go first? Y/N");
         String first = sc.nextLine();
         System.out.println();
@@ -30,7 +33,7 @@ public class TicTacToe {
         }
         int allowedDepth = difficulty == 1 ? 0 : (difficulty == 2 ? 4 : gb.getSize() * gb.getSize());
 
-        // take turns to play game
+        // start game
         while (gb.cellLeft > 0) {
             if (curtPlayer == 'O') { // player's turn
                 System.out.println("Player " + curtPlayer + " Please input your row and col");
@@ -54,6 +57,7 @@ public class TicTacToe {
                 System.out.println("AI made move on " + res[0] + " " + res[1]);
                 if (gb.checkWin(curtPlayer)) {
                     gb.displayBoard();
+                    System.out.println();
                     break;
                 }
                 curtPlayer = 'O';
@@ -61,6 +65,7 @@ public class TicTacToe {
             gb.displayBoard();
             System.out.println();
         }
+        // print final result
         if (gb.cellLeft == 0) {
             if (gb.checkWin(gb.AI_MARK)) {
                 System.out.println("X has won!");

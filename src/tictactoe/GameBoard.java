@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 /**
  * Created by Wei Shi on 5/1/17.
  */
@@ -12,10 +11,11 @@ public class GameBoard {
     char[][] board;
     private static int SIZE = 4;
     int cellLeft = SIZE * SIZE;
-    static char PLAYER_MARK = 'O';
-    static char AI_MARK= 'X';
+    char PLAYER_MARK = 'O';
+    char AI_MARK= 'X';
+
     /**
-     * Some variables to record information
+     * Some variables to record alpha-beta search information
      */
     private boolean cutoff;
     private int maxDepth, totalNodes, maxCount , minCount;
@@ -24,7 +24,6 @@ public class GameBoard {
 
     public GameBoard() {
         board = new char[SIZE][SIZE];
-
         // intialize board
         for (int row = 0; row < SIZE; row++) {
             Arrays.fill(board[row], '~');
@@ -41,6 +40,13 @@ public class GameBoard {
         return SIZE;
     }
 
+    /**
+     * let a player make a move on board
+     * @param player
+     * @param row
+     * @param col
+     * @return a boolean value whether this move is valid
+     */
     public boolean makeMove(char player, int row, int col) {
         if (row >= 0 && row < SIZE && col >= 0 && col < SIZE) {
             if (board[row][col] == '~') {
@@ -55,6 +61,11 @@ public class GameBoard {
         }
     }
 
+    /**
+     * check if a player wins
+     * @param player
+     * @return a boolean value whether this player wins
+     */
     public boolean checkWin(char player) {
         // check row
         boolean win = false;
@@ -94,7 +105,10 @@ public class GameBoard {
     }
 
 
-
+    /**
+     * get all cells that a player can make move on
+     * @return
+     */
     public List<int[]> getAvailableCell() {
         List<int[]> result = new ArrayList<>();
         for (int row = 0; row < SIZE; row++) {
@@ -107,6 +121,11 @@ public class GameBoard {
         return result;
     }
 
+    /**
+     * main function of alpha-beta search
+     * @param difficulty
+     * @return a best move
+     */
     public int[] ABSearch(int difficulty) {
         cutoff = false;
         totalNodes = 1;
@@ -133,12 +152,20 @@ public class GameBoard {
             System.out.println("Cutoff occured!");
         }
         System.out.println("Generated " + totalNodes + " nodes.");
-        System.out.println("Max_Value function called " + maxCount + " times.");
-        System.out.println("Min_Value function called " + minCount + " times.");
+        System.out.println("Max_Value pruning occured " + maxCount + " times.");
+        System.out.println("Min_Value pruning occured " + minCount + " times.");
         System.out.println("Max depth is " + maxDepth);
         return move;
     }
 
+    /**
+     * max-value, AI makes a move in this function
+     * @param a
+     * @param b
+     * @param depth
+     * @param difficulty
+     * @return a utility value
+     */
     public int Max_Value(int a, int b, int depth, int difficulty) {
         if (cutoff) {
             return eval();
@@ -148,7 +175,6 @@ public class GameBoard {
         }
 
         totalNodes++;
-        maxCount++;
         maxDepth = Math.max(depth, maxDepth);
         if (!cutoff && (System.currentTimeMillis() - startTime >= TIME_INTERVAL)) { // cutoff
             cutoff = true;
@@ -169,6 +195,7 @@ public class GameBoard {
                 board[point[0]][point[1]] = '~';
 
                 if (value >= b) {
+                    maxCount++;
                     return value;
                 }
                 a = Math.max(a, value);
@@ -177,6 +204,14 @@ public class GameBoard {
         return value;
     }
 
+    /**
+     * min-value, player makes a move in this function
+     * @param a
+     * @param b
+     * @param depth
+     * @param difficulty
+     * @return a utility value
+     */
     public int Min_Value(int a, int b, int depth, int difficulty) {
         if (cutoff) {
             return eval();
@@ -185,7 +220,6 @@ public class GameBoard {
             return 0;
         }
         totalNodes++;
-        minCount++;
         maxDepth = Math.max(depth, maxDepth);
 
         if (!cutoff && System.currentTimeMillis() - startTime >= TIME_INTERVAL) { // cutoff
@@ -207,6 +241,7 @@ public class GameBoard {
                 board[point[0]][point[1]] = '~';
 
                 if (value <= a) {
+                    minCount++;
                     return value;
                 }
                 b = Math.min(b, value);
@@ -215,6 +250,10 @@ public class GameBoard {
         return value;
     }
 
+    /**
+     * evaluation function eval(n) = 6X3 + 3X2 + X1 - (6O3 + 3O2 + O1)
+     * @return
+     */
     public int eval() {
         int[] x = new int[SIZE];
         int[] o = new int[SIZE];
