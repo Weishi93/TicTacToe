@@ -170,6 +170,9 @@ public class GameBoard {
         if (cutoff) {
             return eval();
         }
+        if (difficulty == 1) {
+            return eval2();
+        }
         if (depth >= difficulty) {
             return 0;
         }
@@ -215,6 +218,9 @@ public class GameBoard {
     public int Min_Value(int a, int b, int depth, int difficulty) {
         if (cutoff) {
             return eval();
+        }
+        if (difficulty == 1) {
+            return eval2();
         }
         if (depth >= difficulty) {
             return 0;
@@ -329,5 +335,82 @@ public class GameBoard {
         }
         return 6 * x[2] + 3 * x[1] + x[0] - (6 * o[2] + 3 * o[1] + o[0]);
     }
+
+    public int eval2() {
+        int[] x = new int[SIZE];
+        int[] o = new int[SIZE];
+        // check row
+        for (int row = 0; row < SIZE; row++) {
+            int xNum = 0, oNum = 0;
+            for (int col = 0; col < SIZE; col++) {
+                if (board[row][col] == AI_MARK) {
+                    xNum++;
+                } else if (board[row][col] == PLAYER_MARK) {
+                    oNum++;
+                }
+            }
+            if (oNum == 0 && xNum == 0) continue;
+            if (oNum == 0) {
+                x[xNum - 1]++;
+            }
+            if (xNum == 0) {
+                o[oNum - 1]++;
+            }
+        }
+
+        // check col
+        for (int col = 0; col < SIZE; col++) {
+            int xNum = 0, oNum = 0;
+            for (int row = 0; row < SIZE; row++) {
+                if (board[row][col] == AI_MARK) {
+                    xNum++;
+                } else if (board[row][col] == PLAYER_MARK) {
+                    oNum++;
+                }
+            }
+            if (oNum == 0 && xNum == 0) continue;
+            if (oNum == 0) {
+                x[xNum - 1]++;
+            }
+            if (xNum == 0) {
+                o[oNum - 1]++;
+            }
+        }
+
+        // check diagnoal
+        for (int i = 0; i < SIZE; i++) {
+            int xNum = 0, oNum = 0;
+            if (board[i][i] == AI_MARK) {
+                xNum++;
+            } else if (board[i][i] == PLAYER_MARK) {
+                oNum++;
+            }
+            if (oNum == 0 && xNum == 0) continue;
+            if (oNum == 0) {
+                x[xNum - 1]++;
+            }
+            if (xNum == 0) {
+                o[oNum - 1]++;
+            }
+        }
+
+        for (int i = 0; i < SIZE; i++) {
+            int xNum = 0, oNum = 0;
+            if (board[i][SIZE - i - 1] == AI_MARK) {
+                xNum++;
+            } else if (board[i][SIZE - i - 1] == PLAYER_MARK) {
+                oNum++;
+            }
+            if (oNum == 0 && xNum == 0) continue;
+            if (oNum == 0) {
+                x[xNum - 1]++;
+            }
+            if (xNum == 0) {
+                o[oNum - 1]++;
+            }
+        }
+        return 6 * x[2]  + x[0] - (6 * o[2] + o[0]);
+    }
+
 }
 

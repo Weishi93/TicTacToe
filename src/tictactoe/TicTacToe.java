@@ -31,7 +31,7 @@ public class TicTacToe {
         } else {
             curtPlayer = 'X';
         }
-        int allowedDepth = difficulty == 1 ? 0 : (difficulty == 2 ? 4 : gb.getSize() * gb.getSize());
+        int allowedDepth = difficulty == 1 ? 0 : (difficulty == 2 ? 1 : gb.getSize() * gb.getSize());
 
         // start game
         while (gb.cellLeft > 0) {
